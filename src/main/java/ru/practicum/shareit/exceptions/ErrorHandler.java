@@ -22,4 +22,11 @@ public class ErrorHandler {
         log.debug("Received status 404 NOT FOUND {}", e.getMessage(), e);
         return new ErrorResponse(e.getMessage());
     }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ErrorResponse handleAccessException(final AccessException e) {
+        log.debug("Received status 403 FORBIDDEN {}", e.getMessage(), e);
+        return new ErrorResponse(e.getMessage());
+    }
 }
