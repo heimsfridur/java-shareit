@@ -17,7 +17,7 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
-    private Map<Integer, Item> items = new HashMap<>();
+    private final Map<Integer, Item> items = new HashMap<>();
     private int id = 1;
     private final ItemMapper itemMapper;
 
