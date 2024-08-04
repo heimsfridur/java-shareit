@@ -7,6 +7,7 @@ import ru.practicum.shareit.exceptions.AccessException;
 import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.util.ArrayList;
@@ -22,13 +23,15 @@ public class ItemServiceImpl implements ItemService {
     private final ItemMapper itemMapper;
 
     private final UserService userService;
+    private final UserMapper userMapper;
+
 
     @Override
     public ItemDto add(ItemDto itemDto, int ownerId) {
         userService.validateById(ownerId);
         Item item = itemMapper.toItem(itemDto);
         item.setId(id++);
-        item.setOwner(ownerId);
+        item.setOwner(userMapper.toUser(userService.getById(ownerId)));
         items.put(item.getId(), item);
         return itemMapper.toItemDto(item);
     }
@@ -37,7 +40,7 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto update(int itemId, int ownerId, ItemDto newItemDto) {
         validateById(itemId);
         Item item = items.get(itemId);
-        if (item.getOwner() != ownerId) {
+        if (item.getOwner().getId() != ownerId) {
             throw new AccessException("Only owner can update item");
         }
 
@@ -63,7 +66,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public List<ItemDto> getAll(int ownerId) {
         return items.values().stream()
-                .filter(item -> item.getOwner() == ownerId)
+                .filter(item -> item.getOwner().getId() == ownerId)
                 .map(item -> itemMapper.toItemDto(item))
                 .toList();
     }

@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import ru.practicum.shareit.request.model.ItemRequest;
 
 /**
  * TODO Sprint add-controllers.
@@ -21,5 +22,5 @@ public class ItemDto {
     private String description;
     @NotNull
     private Boolean available;
-    private Integer request;
+    private ItemRequest request;
 }
