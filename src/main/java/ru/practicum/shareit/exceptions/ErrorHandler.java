@@ -13,7 +13,7 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handleEmailIsNotUniqueException(final EmailIsNotUniqueException e) {
-        log.debug("Received status 409 Conflict {}", e.getMessage(), e);
+        log.debug("Received status 409 CONFLICT {}", e.getMessage(), e);
         return new ErrorResponse(e.getMessage());
     }
 
