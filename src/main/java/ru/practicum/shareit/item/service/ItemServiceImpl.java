@@ -12,9 +12,7 @@ import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -81,7 +79,7 @@ public class ItemServiceImpl implements ItemService {
                 .toList();
     }
 
-    private void validateById(int id) {
+    public void validateById(int id) {
         if (!itemRepository.existsById(id)) {
             throw new NotFoundException(String.format("Item with id %d is not found.", id));
         }

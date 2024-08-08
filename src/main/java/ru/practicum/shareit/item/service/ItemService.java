@@ -14,4 +14,6 @@ public interface ItemService {
     List<ItemDto> getAll(int ownerId);
 
     List<ItemDto> find(String text);
+
+    void validateById(int id);
 }
