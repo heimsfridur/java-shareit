@@ -42,7 +42,4 @@ public class UserController {
                             @PathVariable int userId) {
         return userService.update(userId, newUserDto);
     }
-
-
-
 }

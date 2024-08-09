@@ -13,7 +13,7 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handleEmailIsNotUniqueException(final EmailIsNotUniqueException e) {
-        log.debug("Received status 409 Conflict {}", e.getMessage(), e);
+        log.debug("Received status 409 CONFLICT {}", e.getMessage(), e);
         return new ErrorResponse(e.getMessage());
     }
 
@@ -42,6 +42,35 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleThrowable(final Throwable e) {
         log.debug("Received status 500 INTERNAL SERVER ERROR {}. ", e.getMessage(), e);
-        return new ErrorResponse("Unexpected error" + e.getMessage());
+        return new ErrorResponse("Unexpected error. " + e.getMessage());
     }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleWrongStateParameterException(final WrongStateParameterException e) {
+        log.debug("Received status 400 BAD REQUEST {}. ", e.getMessage(), e);
+        return new ErrorResponse("Status mode is wrong in search. " + e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleBookingUnavailableItemException(final BookingUnavailableItemException e) {
+        log.debug("Received status 400 BAD REQUEST {}. ", e.getMessage(), e);
+        return new ErrorResponse("Item is unavailable. " + e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleBookingApproveAccessException(final BookingApproveAccessException e) {
+        log.debug("Received status 400 BAD REQUEST {}. ", e.getMessage(), e);
+        return new ErrorResponse(e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleUnavailableToAddCommentException(final UnavailableToAddCommentException e) {
+        log.debug("Received status 400 BAD REQUEST {}. ", e.getMessage(), e);
+        return new ErrorResponse(e.getMessage());
+    }
+
 }
