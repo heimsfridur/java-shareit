@@ -2,15 +2,28 @@ package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.booking.BookingMapper;
+import ru.practicum.shareit.booking.BookingRepository;
+import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.exceptions.AccessException;
+import ru.practicum.shareit.exceptions.UnavailableToAddCommentException;
+import ru.practicum.shareit.item.CommentMapper;
 import ru.practicum.shareit.item.ItemMapper;
-import ru.practicum.shareit.item.ItemRepository;
+import ru.practicum.shareit.item.dto.CommentDtoExport;
+import ru.practicum.shareit.item.model.Comment;
+import ru.practicum.shareit.item.repository.CommentRepository;
+import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserMapper;
+import ru.practicum.shareit.user.UserRepository;
+import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
+import java.util.Optional;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +33,12 @@ public class ItemServiceImpl implements ItemService {
     private final ItemMapper itemMapper;
     private final UserService userService;
     private final UserMapper userMapper;
+    private final CommentMapper commentMapper;
+    private final BookingMapper bookingMapper;
     private final ItemRepository itemRepository;
+    private final UserRepository userRepository;
+    private final BookingRepository bookingRepository;
+    private final CommentRepository commentRepository;
 
     @Override
     public ItemDto add(ItemDto itemDto, int ownerId) {
@@ -54,9 +72,31 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto getById(int itemId) {
-        validateById(itemId);
-        return itemMapper.toItemDto(itemRepository.findById(itemId).get());
+    public ItemDto getById(int itemId, int userId) {
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new NotFoundException(String.format("Can not find item with id %d.", itemId)));
+
+        List<CommentDtoExport> comments = commentRepository.findAllByItemId(item.getId())
+                .stream()
+                .map(CommentMapper::toCommentDtoExport)
+                .toList();
+
+
+        ItemDto itemDto = itemMapper.toItemDto(itemRepository.findById(itemId).get());
+        itemDto.setComments(comments);
+
+        if (item.getOwner().getId() == userId) {
+            Optional<Booking> lastBooking = bookingRepository.findFirstByItemIdAndStartBeforeAndStatusNotOrderByStartDesc(itemId, LocalDateTime.now(), BookingStatus.REJECTED);
+            if (!lastBooking.isEmpty()) {
+                itemDto.setLastBooking(bookingMapper.toBookingDto(lastBooking.get()));
+            }
+            Optional<Booking> nextBooking = bookingRepository.findFirstByItemIdAndStartAfterAndStatusNotOrderByStart(itemId, LocalDateTime.now(), BookingStatus.REJECTED);
+            if (!nextBooking.isEmpty()) {
+                itemDto.setNextBooking(bookingMapper.toBookingDto(nextBooking.get()));
+            }
+        }
+
+        return itemDto;
     }
 
     @Override
@@ -77,6 +117,27 @@ public class ItemServiceImpl implements ItemService {
                 .filter(Item::getAvailable)
                 .map(item -> itemMapper.toItemDto(item))
                 .toList();
+    }
+
+    @Override
+    public CommentDtoExport addComment(int itemId, int userId, Comment comment) {
+        User author =  userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(String.format("Can not find user with id %d.", userId)));
+
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new NotFoundException(String.format("Can not find item with id %d.", itemId)));
+
+        Optional<Booking> bookingOptional = bookingRepository.findFirstByBookerIdAndEndBeforeAndStatusNot(userId, LocalDateTime.now(), BookingStatus.REJECTED);
+        if (bookingOptional.isEmpty()) {
+            throw new UnavailableToAddCommentException("Can not add comment, because there was no booking.");
+        }
+        comment.setCreated(LocalDateTime.now());
+        comment.setItem(item);
+        comment.setAuthor(author);
+
+        Comment savedComment = commentRepository.save(comment);
+        return commentMapper.toCommentDtoExport(comment);
+
     }
 
     public void validateById(int id) {

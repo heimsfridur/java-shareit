@@ -25,12 +25,10 @@ public class Comment {
     @NotBlank(message = "Comment should not be empty.")
     private String text;
 
-    @NotNull
     @ManyToOne
     @JoinColumn(name = "item_id")
     private Item item;
 
-    @NotNull
     @ManyToOne
     @JoinColumn(name = "author_id")
     private User author;
