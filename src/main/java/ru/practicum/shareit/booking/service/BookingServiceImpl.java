@@ -87,6 +87,7 @@ public class BookingServiceImpl implements BookingService {
             case CURRENT:
                 bookingList = bookingRepository.findAllByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(userId,
                         currentTime, currentTime);
+                break;
             case PAST:
                 bookingList = bookingRepository.findAllByBookerIdAndEndBeforeOrderByStartDesc(userId, currentTime);
                 break;
@@ -94,7 +95,8 @@ public class BookingServiceImpl implements BookingService {
                 bookingList = bookingRepository.findAllByBookerIdAndStartAfterOrderByStartDesc(userId, currentTime);
                 break;
             case WAITING:
-                bookingList = bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(userId, BookingStatus.WAITING) ;
+                bookingList = bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(userId, BookingStatus.WAITING);
+                break;
             case REJECTED:
                 throw new WrongStateParameterException("State parameter is wrong.");
         }
@@ -121,7 +123,7 @@ public class BookingServiceImpl implements BookingService {
                 bookingList = bookingRepository.findAllByItemOwnerIdAndStartAfterOrderByStartDesc(userId, currentTime);
                 break;
             case WAITING:
-                bookingList = bookingRepository.findAllByItemOwnerIdAndStatusOrderByStartDesc(userId, BookingStatus.WAITING) ;
+                bookingList = bookingRepository.findAllByItemOwnerIdAndStatusOrderByStartDesc(userId, BookingStatus.WAITING);
             case REJECTED:
                 throw new WrongStateParameterException("State parameter is wrong.");
         }
