@@ -12,7 +12,6 @@ import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
@@ -25,10 +24,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
-    private final BookingMapper bookingMapper;
     private final UserService userService;
     private final UserRepository userRepository;
-    private final ItemService itemService;
     private final ItemRepository itemRepository;
 
 
@@ -47,7 +44,7 @@ public class BookingServiceImpl implements BookingService {
 
         Booking booking = BookingMapper.toBookingFromBookingRequest(bookingDtoRequest, item,booker, BookingStatus.WAITING);
         Booking savedBooking = bookingRepository.save(booking);
-        return bookingMapper.toBookingDto(savedBooking);
+        return BookingMapper.toBookingDto(savedBooking);
     }
 
     @Override
@@ -60,7 +57,7 @@ public class BookingServiceImpl implements BookingService {
         }
         BookingStatus newStatus = approved ? BookingStatus.APPROVED : BookingStatus.REJECTED;
         booking.setStatus(newStatus);
-        return bookingMapper.toBookingDto(booking);
+        return BookingMapper.toBookingDto(booking);
     }
 
     @Override
@@ -72,7 +69,7 @@ public class BookingServiceImpl implements BookingService {
         if (userId != bookingBookerId && userId != itemOwnerId) {
             throw new AccessException("Only booker or item owner can booking details.");
         }
-        return bookingMapper.toBookingDto(bookingRepository.findById(bookingId).get());
+        return BookingMapper.toBookingDto(bookingRepository.findById(bookingId).get());
     }
 
     @Override

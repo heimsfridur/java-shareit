@@ -32,9 +32,6 @@ import java.util.List;
 public class ItemServiceImpl implements ItemService {
     private final ItemMapper itemMapper;
     private final UserService userService;
-    private final UserMapper userMapper;
-    private final CommentMapper commentMapper;
-    private final BookingMapper bookingMapper;
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
@@ -44,7 +41,7 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto add(ItemDto itemDto, int ownerId) {
         userService.validateById(ownerId);
         Item item = itemMapper.toItem(itemDto);
-        item.setOwner(userMapper.toUser(userService.getById(ownerId)));
+        item.setOwner(UserMapper.toUser(userService.getById(ownerId)));
         return itemMapper.toItemDto(itemRepository.save(item));
     }
 
@@ -88,11 +85,11 @@ public class ItemServiceImpl implements ItemService {
         if (item.getOwner().getId() == userId) {
             Optional<Booking> lastBooking = bookingRepository.findFirstByItemIdAndStartBeforeAndStatusNotOrderByStartDesc(itemId, LocalDateTime.now(), BookingStatus.REJECTED);
             if (!lastBooking.isEmpty()) {
-                itemDto.setLastBooking(bookingMapper.toBookingDto(lastBooking.get()));
+                itemDto.setLastBooking(BookingMapper.toBookingDto(lastBooking.get()));
             }
             Optional<Booking> nextBooking = bookingRepository.findFirstByItemIdAndStartAfterAndStatusNotOrderByStart(itemId, LocalDateTime.now(), BookingStatus.REJECTED);
             if (!nextBooking.isEmpty()) {
-                itemDto.setNextBooking(bookingMapper.toBookingDto(nextBooking.get()));
+                itemDto.setNextBooking(BookingMapper.toBookingDto(nextBooking.get()));
             }
         }
 
@@ -136,7 +133,7 @@ public class ItemServiceImpl implements ItemService {
         comment.setAuthor(author);
 
         Comment savedComment = commentRepository.save(comment);
-        return commentMapper.toCommentDtoExport(comment);
+        return CommentMapper.toCommentDtoExport(savedComment);
 
     }
 

@@ -14,14 +14,13 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    private final UserMapper userMapper;
     private final UserRepository userRepository;
 
     @Override
     public UserDto add(UserDto userDto) {
         validateUserDtoEmail(userDto);
-        User user = userRepository.save(userMapper.toUser(userDto));
-        return userMapper.toUserDto(user);
+        User user = userRepository.save(UserMapper.toUser(userDto));
+        return UserMapper.toUserDto(user);
     }
 
     @Override
@@ -41,7 +40,7 @@ public class UserServiceImpl implements UserService {
         }
 
         User user = userRepository.save(oldUser);
-        return userMapper.toUserDto(user);
+        return UserMapper.toUserDto(user);
     }
 
     @Override
@@ -52,13 +51,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDto> getAll() {
-        return userRepository.findAll().stream().map(user -> userMapper.toUserDto(user)).toList();
+        return userRepository.findAll().stream().map(user -> UserMapper.toUserDto(user)).toList();
     }
 
     @Override
     public UserDto getById(int id) {
         validateById(id);
-        return userMapper.toUserDto(userRepository.findById(id).get());
+        return UserMapper.toUserDto(userRepository.findById(id).get());
     }
 
     private void validateUserDtoEmail(UserDto userDto) {
