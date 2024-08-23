@@ -5,6 +5,7 @@ services:
     container_name: shareit-gateway
     ports:
       - "8080:8080"
+      - "5006:5006"
     depends_on:
       - server
     environment:
@@ -16,6 +17,7 @@ services:
     container_name: shareit-server
     ports:
       - "9090:9090"
+      - "5005:5005"
     depends_on:
       - db
     environment:

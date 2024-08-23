@@ -135,10 +135,16 @@ public class ItemServiceImpl implements ItemService {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException(String.format("Can not find item with id %d.", itemId)));
 
-        Optional<Booking> bookingOptional = bookingRepository.findFirstByBookerIdAndEndBeforeAndStatusNot(userId, LocalDateTime.now(), BookingStatus.REJECTED);
-        if (bookingOptional.isEmpty()) {
-            throw new UnavailableToAddCommentException("Can not add comment, because there was no booking.");
+        List<Booking> bookings = bookingRepository.findAllByBookerIdAndItemId(userId, itemId);
+
+        boolean isAbleToAddComment = bookings.stream()
+                .anyMatch(booking -> booking.getEnd().isBefore(LocalDateTime.now())
+                        && booking.getStatus().equals(BookingStatus.APPROVED));
+
+        if (!isAbleToAddComment) {
+            throw new UnavailableToAddCommentException("Can not add comment, because booking is not ended or wasnt approved.");
         }
+
         comment.setCreated(LocalDateTime.now());
         comment.setItem(item);
         comment.setAuthor(author);
