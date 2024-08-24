@@ -152,7 +152,6 @@ public class ItemServiceImpl implements ItemService {
 
         Comment savedComment = commentRepository.save(CommentMapper.toComment(comment));
         return CommentMapper.toCommentDtoExport(savedComment);
-
     }
 
     public void validateById(int id) {
