@@ -11,6 +11,7 @@ import ru.practicum.shareit.exceptions.AccessException;
 import ru.practicum.shareit.exceptions.UnavailableToAddCommentException;
 import ru.practicum.shareit.item.CommentMapper;
 import ru.practicum.shareit.item.ItemMapper;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.CommentDtoExport;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.repository.CommentRepository;
@@ -128,7 +129,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public CommentDtoExport addComment(int itemId, int userId, Comment comment) {
+    public CommentDtoExport addComment(int itemId, int userId, CommentDto comment) {
         User author =  userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(String.format("Can not find user with id %d.", userId)));
 
@@ -149,7 +150,7 @@ public class ItemServiceImpl implements ItemService {
         comment.setItem(item);
         comment.setAuthor(author);
 
-        Comment savedComment = commentRepository.save(comment);
+        Comment savedComment = commentRepository.save(CommentMapper.toComment(comment));
         return CommentMapper.toCommentDtoExport(savedComment);
 
     }
